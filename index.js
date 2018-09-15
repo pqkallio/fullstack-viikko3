@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let persons = [
     {
@@ -24,6 +27,8 @@ let persons = [
     }
 ]
 
+const generateId = () => Math.floor(Math.random() * ~(1 << 31)) + 1
+
 app.get('/info', (req, res) => {
     res.send(`
         <div>
@@ -34,6 +39,32 @@ app.get('/info', (req, res) => {
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)
+})
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+
+    if (body.name === undefined) {
+        return res.status(400).json({ error: 'name must be given' })
+    }
+
+    if (body.number === undefined) {
+        return res.status(400).json({ error: 'number must be given' })
+    }
+
+    if (persons.find(p => p.name === body.name)) {
+        return res.status(400).json({ error: 'name must be unique' })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
+
+    persons = persons.concat(person)
+
+    return res.json(person)
 })
 
 app.get('/api/persons/:id', (req, res) => {
