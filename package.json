@@ -19,9 +19,10 @@
   },
   "homepage": "https://github.com/pqkallio/fullstack-viikko3#readme",
   "dependencies": {
-    "morgan": "^1.9.1",
     "cors": "^2.8.4",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "mongoose": "^5.2.15",
+    "morgan": "^1.9.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"
