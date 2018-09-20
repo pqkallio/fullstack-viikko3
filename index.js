@@ -3,6 +3,15 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
+
+const formatPerson = (person) => {
+    return {
+        name: person.name,
+        number: person.number,
+        id: person._id
+    }
+}
 
 app.use(cors())
 app.use(express.static('build'))
@@ -41,15 +50,23 @@ let persons = [
 const generateId = () => Math.floor(Math.random() * ~(1 << 31)) + 1
 
 app.get('/info', (req, res) => {
-    res.send(`
-        <div>
-            <p>puhelinluettelossa on ${persons.length} henkilön tiedot</p>
-            <p>${new Date()}</p>
-        </div>`)
+    Person
+        .find({})
+        .then(persons => {
+            res.send(`
+                <div>
+                    <p>puhelinluettelossa on ${persons.length} henkilön tiedot</p>
+                    <p>${new Date()}</p>
+                </div>`)
+        })
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person
+        .find({})
+        .then(persons => {
+            res.json(persons.map(Person.format))
+        })
 })
 
 app.post('/api/persons', (req, res) => {
@@ -63,30 +80,24 @@ app.post('/api/persons', (req, res) => {
         return res.status(400).json({ error: 'number must be given' })
     }
 
-    if (persons.find(p => p.name === body.name)) {
-        return res.status(400).json({ error: 'name must be unique' })
-    }
-
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-
-    return res.json(person)
+    person
+        .save()
+        .then(savedPerson => {
+            res.json(Person.format(person))
+        })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(p => p.id === id)
-
-    if (person) {
-        res.json(person)
-    } else {
-        res.status(404).end()
-    }
+    Person
+        .findById(req.params.id)
+        .then(person => {
+            res.json(Person.format(person))
+        })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
