@@ -5,14 +5,6 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 
-const formatPerson = (person) => {
-    return {
-        name: person.name,
-        number: person.number,
-        id: person._id
-    }
-}
-
 app.use(cors())
 app.use(express.static('build'))
 
@@ -46,8 +38,6 @@ let persons = [
         id: 4
     }
 ]
-
-const generateId = () => Math.floor(Math.random() * ~(1 << 31)) + 1
 
 app.get('/info', (req, res) => {
     Person
@@ -97,6 +87,24 @@ app.get('/api/persons/:id', (req, res) => {
         .findById(req.params.id)
         .then(person => {
             res.json(Person.format(person))
+        })
+})
+
+app.put('/api/persons/:id', (req, res) => {
+    const body = req.body
+
+    const person = {
+        number: body.number
+    }
+
+    Person
+        .findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            res.json(Person.format(updatedPerson))
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).send({ error: 'Malformatted id' })
         })
 })
 
