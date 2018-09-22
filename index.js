@@ -8,36 +8,13 @@ const Person = require('./models/person')
 app.use(cors())
 app.use(express.static('build'))
 
-morgan.token('data', function(req, res) {
+morgan.token('data', function(req) {
     return JSON.stringify(req.body)
 })
-  
-app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
-  
-app.use(bodyParser.json())
 
-let persons = [
-    {
-        name: "Arto Hellas",
-        number: "040-123456",
-        id: 1
-    },
-    {
-        name: "Martti Tienari",
-        number: "040-123456",
-        id: 2
-    },
-    {
-        name: "Arto Järvinen",
-        number: "040-123456",
-        id: 3
-    },
-    {
-        name: "Lea Kutvonen",
-        number: "040-123456",
-        id: 4
-    }
-]
+app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
+
+app.use(bodyParser.json())
 
 app.get('/info', (req, res) => {
     Person
@@ -77,12 +54,12 @@ app.post('/api/persons', (req, res) => {
 
     person
         .save()
-        .then(savedPerson => {
+        .then(() => {
             res.json(Person.format(person))
         })
         .catch(error => {
             console.log(error)
-            res.status(400).send({ error: "The name must be unique." })
+            res.status(400).send({ error: 'The name must be unique.' })
         })
 })
 
@@ -123,10 +100,10 @@ app.put('/api/persons/:id', (req, res) => {
 app.delete('/api/persons/:id', (req, res) => {
     Person
         .findByIdAndRemove(req.params.id)
-        .then(result => {
+        .then(() => {
             res.status(204).end()
         })
-        .catch(error => {
+        .catch(() => {
             res.status(400).send({ error: 'Malformatted id' })
         })
 })

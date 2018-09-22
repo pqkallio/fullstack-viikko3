@@ -6,10 +6,10 @@ const Person = mongoose.model('Person', {
     number: String
 })
 
-if (process.argv.length == 4) {
+if (process.argv.length === 4) {
     mongoose.connect(db_url)
     console.log(`lisätään henkilö ${process.argv[2]} numero ${process.argv[3]} luetteloon`)
-    
+
     const person = new Person({
         name: process.argv[2],
         number: process.argv[3]
@@ -17,11 +17,11 @@ if (process.argv.length == 4) {
 
     person
         .save()
-        .then(response => {
+        .then(() => {
             console.log('lisätty onnistuneesti!')
             mongoose.connection.close()
         })
-} else if (process.argv.length == 2) {
+} else if (process.argv.length === 2) {
     mongoose.connect(db_url)
     Person
         .find({})
