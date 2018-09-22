@@ -80,6 +80,10 @@ app.post('/api/persons', (req, res) => {
         .then(savedPerson => {
             res.json(Person.format(person))
         })
+        .catch(error => {
+            console.log(error)
+            res.status(400).send({ error: "The name must be unique." })
+        })
 })
 
 app.get('/api/persons/:id', (req, res) => {

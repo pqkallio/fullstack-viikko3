@@ -1,13 +1,24 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
-const dbUri = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@ds161092.mlab.com:61092/fullstack-puhelinluettelo`
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
 
-mongoose.connect(dbUri)
+const dbUrl = process.env.MONGODB_URI
+
+mongoose.connect(dbUrl)
 
 const personSchema = new Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        unique: [true, 'The name must be unique.'],
+        required: [true, 'Name required.']
+    },
+    number: {
+        type: String,
+        required: [true, 'Number required.']
+    }
 })
 
 personSchema.statics.format = function(person) {
